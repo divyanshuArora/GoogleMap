@@ -33,6 +33,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -97,7 +98,7 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
     String source,desti,destinationName;
 
-
+    SupportMapFragment supportMapFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,11 +106,11 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
         getPermission();
 
-
-
         swap_locationClick = findViewById(R.id.swap_location);
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
+
 
         points = new ArrayList<LatLng>();
         if (!Places.isInitialized()) {
@@ -175,6 +176,7 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
 
 
+
         swap_locationClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +186,11 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
 
     }
+
+
+
+
+
 
     @SuppressLint("ResourceType")
     private void swapLocationValue()
@@ -351,6 +358,8 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
             return ;
         }
 
+
+
         // Permissions ok, we get last location
         location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
@@ -392,27 +401,7 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         }
     }
 
-//    Location   mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-//            if (mLastLocation != null) {
-//        originLatitude = mLastLocation.getLatitude();
-//        originLongitude = mLastLocation.getLongitude();
-//
-//        Geocoder geocoder = new Geocoder(this,Locale.getDefault());
-//
-//        try {
-//            List<Address> location = geocoder.getFromLocation(originLatitude,originLongitude,1);
-//
-//            String city = location.get(0).getAddressLine(0);
-//
-//            autocomplete_fragment_origin.setText(city);
-//
-//
-//
-//        } catch (IOException e) {
-//            Log.d(TAG, "onConnected Exception: "+e);
-//        }
-//
-//    }
+
 
 
     @Override
@@ -489,6 +478,8 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMaps) {
         googleMap = googleMaps;
+        googleMaps.setPadding(20,1100,20,20);
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
@@ -726,18 +717,4 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
         }
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
