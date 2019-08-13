@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Near_By_Places">
+
+
+    <!--<fragment-->
+
+        <!--android:id="@+id/map"-->
+        <!--android:layout_weight="1"-->
+        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--/>-->
+    
+    
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="#ffffff"
+        android:elevation="10dp"
+        ></androidx.recyclerview.widget.RecyclerView>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:cardBackgroundColor="#ffffff"
+        android:elevation="5dp"
+        android:padding="5dp"
+        android:layout_marginTop="7dp"
+        >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:weightSum="3"
+        >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Restaurents"
+            android:layout_margin="5dp"
+            android:background="@drawable/rectangle_shape"
+            />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Hospitals"
+            android:background="@drawable/rectangle_shape"
+            android:layout_margin="5dp"
+            />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Schools"
+            android:layout_margin="5dp"
+            android:background="@drawable/rectangle_shape"
+            />
+
+
+
+    </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+    
+    
+    
+    
+    
+    
+
+</LinearLayout>

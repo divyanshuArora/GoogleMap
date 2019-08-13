@@ -5,41 +5,32 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Path;
 import android.icu.text.DecimalFormat;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.EditText;
+import android.view.Window;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,7 +41,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -63,21 +53,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.AllPermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final int MY_LOCATION_REQUEST_CODE = 100;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final long UPDATE_INTERVAL = 5000, FASTEST_INTERVAL = 5000; // = 5 seconds
     private static final String TAG = "AutoFragmentSearch" ;
     private GoogleMap googleMap;
     GoogleApiClient googleApiClient;
@@ -85,7 +72,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
     ArrayList<String> permissionToRequest;
     ArrayList<String> permissionRejected = new ArrayList<>();
     ArrayList<String> permissions = new ArrayList<>();
-    private LocationRequest locationRequest;
     private static final int ALL_PERMISSION_RESULT= 1011;
     private Location location;
     Marker mCurrLocationMarker;
@@ -93,12 +79,11 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
     LatLng  sourceLatLong;
     LatLng destiLatLong;
     AutocompleteSupportFragment autocomplete_fragment_origin,autocomplete_fragment_destination;
-
     ImageView swap_locationClick;
-
     String source,desti,destinationName;
-
     SupportMapFragment supportMapFragment;
+    List<Address> addresses;
+    Geocoder geocoder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,8 +101,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         if (!Places.isInitialized()) {
             Places.initialize(AutoFragmentSearch.this, getString(R.string.API_KEY), Locale.US);
         }
-
-
         ////////////////////origin
         autocomplete_fragment_origin = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment_origin);
         autocomplete_fragment_origin.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
@@ -125,14 +108,13 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         autocomplete_fragment_origin.setHint("source");
         autocomplete_fragment_origin.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(@NonNull Place place_origin) {
+            public void onPlaceSelected(@NonNull Place place_origin)
+            {
 
                 Log.d(TAG, "onPlaceSelected: " + place_origin.getName());
                 Log.d(TAG, "onPlaceSelected: " + place_origin.getId());
                 Log.d(TAG, "onPlaceSelected: " + place_origin.getAddress());
                 Log.d(TAG, "onPlaceSelected: " + place_origin.getLatLng());
-
-
                 sourceLatLong = place_origin.getLatLng();
                 originLatitude = place_origin.getLatLng().latitude;
                 originLongitude = place_origin.getLatLng().longitude;
@@ -165,32 +147,37 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
                 destinationName = placeDestination.getName();
                 SearchLocationMethod(placeDestination.getLatLng(), placeDestination.getName());
 
-                CalculationByDistance(sourceLatLong,destiLatLong);
+                double currentLat;
+                double currentLong;
+                double destiLat;
+                double destiLong;
+
+                currentLat = sourceLatLong.latitude;
+                currentLong = sourceLatLong.longitude;
+                destiLat = destiLatLong.latitude;
+                destiLong = destiLatLong.longitude;
+
+                String uri ="http://maps.google.com/maps?saddr="+currentLat+","+currentLong+ "&daddr="+destiLat+","+destiLong;
+                Intent googleMap  = new Intent(Intent.ACTION_VIEW,Uri.parse(uri));
+                googleMap.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(googleMap);
+
+
+
+                //CalculationByDistance(sourceLatLong,destiLatLong);
             }
             @Override
             public void onError(@NonNull Status status) {
                 Log.d(TAG, "onError: " + status);
             }
         });
-
-
-
-
-
         swap_locationClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 swapLocationValue();
             }
         });
-
-
     }
-
-
-
-
-
 
     @SuppressLint("ResourceType")
     private void swapLocationValue()
@@ -225,11 +212,7 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
 
         SearchLocationMethod(destiLatLong, destinationName);
-
-
-
     }
-
 
     private void SearchLocationMethod(LatLng latLng, String name)
     {
@@ -259,16 +242,7 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
                 googleMap.addMarker(markerOptions.position(latLng).title(name));
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-
-
-
-
-
-
-
-
-
-            LatLng destination =  latLng;
+                LatLng destination =  latLng;
 
 
             String url= GetDataFromUrl.getDirectionsUrl(origin,destination,getString(R.string.API_KEY));
@@ -285,7 +259,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
             Log.d(TAG, "SearchLocationMethod exception: "+e);
         }
     }
-
     private void getPermission() {
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -306,7 +279,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
 
     }
-
     private ArrayList<String> permissionToRequest(ArrayList<String> requestedpermissions)
     {
         ArrayList<String> result = new ArrayList<>();
@@ -320,7 +292,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         }
         return permissions;
     }
-
     private boolean hasermission(String permission)
     {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -330,27 +301,14 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
         return true;
     }
-
     @Override
-    public void onLocationChanged(Location location)
-    {
-    }
-
+    public void onLocationChanged(Location location) { }
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
+    public void onProviderEnabled(String provider) { }
     @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
+    public void onProviderDisabled(String provider) { }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&  ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -400,10 +358,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
 
         }
     }
-
-
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
@@ -464,27 +418,74 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
                 break;
         }
     }
-
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
+    public void onConnectionSuspended(int i) { }
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
     @Override
-    public void onMapReady(GoogleMap googleMaps) {
+    public void onMapReady(final GoogleMap googleMaps) {
         googleMap = googleMaps;
         googleMaps.setPadding(20,1100,20,20);
+
 
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             googleApiClient.connect();
             googleMap.setMyLocationEnabled(true);
+
+
+
+
+
+            googleMaps.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    googleMap.clear();
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+
+
+                    double lat,longitu;
+
+                    lat = latLng.latitude;
+                    longitu = latLng.longitude;
+
+                    geocoder = new Geocoder(AutoFragmentSearch.this,Locale.getDefault());
+                    try {
+                        addresses = geocoder.getFromLocation(lat,longitu,1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    MapData mapData = new MapData();
+                    mapData.setName(addresses.get(0).getAddressLine(0));
+                    mapData.setPlace(addresses.get(0).getLocality());
+                    mapData.setType(addresses.get(0).getPhone());
+                    mapData.setCountry(addresses.get(0).getCountryName());
+
+
+                    googleMaps.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mCurrLocationMarker = googleMaps.addMarker(markerOptions);
+                    Info_Window_Adapter info_window_adapter = new Info_Window_Adapter(getApplicationContext(),mapData);
+                    googleMaps.setInfoWindowAdapter(info_window_adapter);
+
+                    mCurrLocationMarker.showInfoWindow();
+
+
+
+
+
+                }
+            });
+
+
+
+
+
+
+
 
         }
         else
@@ -562,7 +563,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         return data;
     }
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-
         // Parsing the data in non-ui thread
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -587,7 +587,6 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
             }
             return routes;
         }
-
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
@@ -631,17 +630,14 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
             }
         }
     }
-
-
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
         googleApiClient.connect();
     }
-
-
-
-    public double CalculationByDistance(LatLng StartP, LatLng EndP) {
+    public double CalculationByDistance(LatLng StartP, LatLng EndP)
+    {
         int Radius = 6371;// radius of earth in Km
         double lat1 = StartP.latitude;
         double lat2 = EndP.latitude;
@@ -682,15 +678,14 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
         return Radius * c;
     }
 
-
     GoogleMap.OnMyLocationChangeListener onMyLocationChangeListener = new GoogleMap.OnMyLocationChangeListener()
     {
         @Override
-        public void onMyLocationChange(Location location) {
+        public void onMyLocationChange(Location location)
+        {
 
             LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
             mCurrLocationMarker = googleMap.addMarker(new MarkerOptions().position(myLocation));
-
             if (googleMap!=null)
             {
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16.0f));
@@ -700,21 +695,17 @@ public class AutoFragmentSearch extends AppCompatActivity implements OnMapReadyC
                 List<Address> addresses;
                 geocoder = new Geocoder(AutoFragmentSearch.this, Locale.getDefault());
 
-                try {
+                try
+                {
                     addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
                     String  LocationAddress = addresses.get(0).getAddressLine(0);
                     Log.d(TAG, "onMyLocationChange: "+LocationAddress);
-
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
-
-
-
             }
-
-
         }
     };
 }
