@@ -1,4 +1,4 @@
-package com.example.googlemap;
+package com.example.googlemap.Model;
 
 import android.util.Log;
 
@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class GetDataFromUrl {
+public class GetDataFromUrl {
     public static String getDirectionsUrl(LatLng origin, LatLng dest, String string){
 
         // Origin of route

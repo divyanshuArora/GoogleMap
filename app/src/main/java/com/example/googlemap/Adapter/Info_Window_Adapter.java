@@ -1,18 +1,14 @@
-package com.example.googlemap;
+package com.example.googlemap.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.googlemap.Model.MapData;
+import com.example.googlemap.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-
-import org.w3c.dom.Text;
 
 public class Info_Window_Adapter implements GoogleMap.InfoWindowAdapter {
 

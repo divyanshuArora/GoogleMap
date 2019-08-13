@@ -1,4 +1,4 @@
-package com.example.googlemap;
+package com.example.googlemap.Model;
 
 public class MapData {
     String name;

@@ -1,4 +1,4 @@
-package com.example.googlemap;
+package com.example.googlemap.Model;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class DataParser {
+public class DataParser {
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */
     public List<List<HashMap<String,String>>> parse(JSONObject jObject){
 

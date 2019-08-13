@@ -23,8 +23,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/recyclerNearBy"
         android:layout_weight="1"
-        android:background="#ffffff"
+        android:background="#f0f0f0"
         android:elevation="10dp"
         ></androidx.recyclerview.widget.RecyclerView>
 
@@ -48,8 +49,9 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:id="@+id/RestaurantsList"
             android:layout_weight="1"
-            android:text="Restaurents"
+            android:text="Restaurants"
             android:layout_margin="5dp"
             android:background="@drawable/rectangle_shape"
             />
@@ -57,6 +59,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:id="@+id/HospitalsList"
             android:layout_weight="1"
             android:text="Hospitals"
             android:background="@drawable/rectangle_shape"
@@ -66,6 +69,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:id="@+id/SchoolsList"
             android:layout_weight="1"
             android:text="Schools"
             android:layout_margin="5dp"

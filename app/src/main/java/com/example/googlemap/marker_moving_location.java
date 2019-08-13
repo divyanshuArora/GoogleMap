@@ -208,29 +208,6 @@ public class marker_moving_location extends AppCompatActivity implements OnMapRe
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_REQUEST_CODE);
         }
 
-//        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener()
-//        {
-//            @Override
-//            public void onCameraIdle() {
-//                map.clear();
-//                marker.clearColorFilter();
-//                LatLng centerMap = map.getCameraPosition().target;
-//                Log.d(TAG, "onLocationChanged: "+centerMap);
-//                List<Address>addresses;
-//                Geocoder geocoder = new Geocoder(marker_moving_location.this, Locale.getDefault());
-//
-//                try {
-//
-//                    addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),10);
-//                    String address = addresses.get(0).getAddressLine(0);
-//                    Log.d(TAG, "onCameraIdle: "+address);
-//                    search.setText(address);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-
 
         map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override

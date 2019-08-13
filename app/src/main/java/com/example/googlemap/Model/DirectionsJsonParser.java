@@ -1,4 +1,4 @@
-package com.example.googlemap;
+package com.example.googlemap.Model;
 
 import android.util.Log;
 
